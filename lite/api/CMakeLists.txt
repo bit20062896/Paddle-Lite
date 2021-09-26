@@ -78,16 +78,14 @@ if (NOT LITE_ON_TINY_PUBLISH)
     lite_cc_library(paddle_full_api_shared SHARED SRCS ${FULL_API_SRC}
                   DEPS ${full_lib_DEPS} ${external_libs_DEPS} paddle_api_full)
     add_dependencies(paddle_full_api_shared fbs_headers)
+    if (LITE_WITH_CUDA)
+        target_link_libraries(paddle_full_api_shared "-Wl,--whole-archive" ${math_cuda} "-Wl,--no-whole-archive")
+    endif()
+
 
     #static library
     bundle_static_library(paddle_api_full paddle_api_full_bundled bundle_full_api)
     bundle_static_library(paddle_api_light paddle_api_light_bundled bundle_light_api)
-
-
-    if(LITE_WITH_CUDA)
-        target_link_libraries(paddle_full_api_shared ${math_cuda} "-Wl,--whole-archive" kernels "-Wl,--no-whole-archive")
-    endif(LITE_WITH_CUDA)
-
 
     if(WIN32)
         target_link_libraries(paddle_full_api_shared shlwapi.lib)
